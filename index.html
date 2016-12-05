@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    button {
+      width: 60px;
+      height: 30px;
+      border:1px solid;
+    }
+    #save_btn {
+      float: right;
+    }
+    canvas {
+      border-bottom:1px solid;
+      border-top:1px solid;
+    }
+  </style>
+</head>
+<body>
+  <button type="button" id="clear_btn">Clear</button>
+  <button type="button" id="save_btn">Save</button>
+  <br>
+  <canvas id="canvas" width="375" height="375">
+    your browser does not support the canvas tag
+  </canvas>
+  <img id="canvas2image" src="" alt="" width="100%">
+  <script src="./zepto.js"></script>
+  <script src="./event.js"></script>
+  <script>
+    window.onload = function() {
+      var drawflag = false;
+      var hasImage = false;
+      var $canvas = $('#canvas');
+      var canvas = document.getElementById('canvas');
+      var cxt = canvas.getContext('2d');
+      cxt.strokeStyle = 'red';
+      cxt.lineWidth = 4;
+
+      //开始绘画
+      $canvas.bind('touchstart',function(event){
+        drawflag = true;
+        cxt.beginPath();
+        cxt.moveTo(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+      });
+
+      //结束绘画
+      $canvas.bind('touchend',function(){
+        drawflag = false;
+        cxt.closePath();
+      });
+
+      //鼠标移动,绘画
+      $canvas.bind('touchmove',function(event){
+        if(drawflag) {
+          cxt.lineTo(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+          cxt.stroke();
+          hasImage = true;
+        }
+      });
+
+      var clear = document.getElementById('clear_btn');
+      var save = document.getElementById('save_btn');
+      var image = document.getElementById('canvas2image');
+      clear.onclick = function(){
+        //用clearRect方法清空画布
+        document.getElementById('canvas').getContext("2d").clearRect(0,0,375,375);
+        hasImage = false;
+      };
+
+      save.onclick = function(){
+        if (!hasImage) {
+          alert('你好像没有画小幺鸡哦~');
+          return false;
+        }
+        // 转换成图片
+        var src = convertCanvasToImage(canvas);
+        image.src = src;
+      };
+    };
+
+    function convertCanvasToImage(canvas) {
+    	var src = canvas.toDataURL("image/png");
+    	return src;
+    }
+
+  </script>
+</body>
+</html>
